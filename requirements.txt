@@ -1,0 +1,10 @@
+# Core dependencies
+asyncio
+
+# Development dependencies
+pytest>=6.0
+pytest-asyncio
+flake8
+mypy
+
+# You may need to add more dependencies based on your project's needs
