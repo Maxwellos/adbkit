@@ -1,14 +1,14 @@
-from adb.command import Command
+from adb.command.host.devices import HostDevicesCommand
 from adb.protocol import Protocol
+from adb.tracker import Tracker
 
-class ShellCommand(Command):
-    def execute(self, command):
-        if isinstance(command, list):
-            command = ' '.join(map(self._escape, command))
-        self._send(f"shell:{command}")
+class HostTrackDevicesCommand(HostDevicesCommand):
+
+    def execute(self):
+        self._send('host:track-devices')
         reply = self.parser.readAscii(4)
         if reply == Protocol.OKAY:
-            return self.parser.raw()
+            return Tracker(self)
         elif reply == Protocol.FAIL:
             return self.parser.readError()
         else:

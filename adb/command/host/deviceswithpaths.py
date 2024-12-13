@@ -1,10 +1,10 @@
 from adb.command import Command
 from adb.protocol import Protocol
 
-class HostDevicesCommand(Command):
+class HostDevicesWithPathsCommand(Command):
 
     def execute(self):
-        self._send('host:devices')
+        self._send('host:devices-l')
         reply = self.parser.readAscii(4)
         if reply == Protocol.OKAY:
             return self._readDevices()
@@ -24,6 +24,7 @@ class HostDevicesCommand(Command):
         lines = value.decode('ascii').split('\n')
         for line in lines:
             if line:
-                id, type = line.split('\t')
-                devices.append({'id': id, 'type': type})
+                parts = line.split()
+                id, type, path = parts[0], parts[1], parts[2]
+                devices.append({'id': id, 'type': type, 'path': path})
         return devices

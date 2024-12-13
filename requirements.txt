@@ -1,5 +1,6 @@
 # Core dependencies
 asyncio
+cryptography
 
 # Development dependencies
 pytest>=6.0

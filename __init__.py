@@ -1,4 +1,4 @@
-from .client import Client
+from .adb.client import Client
 from .adb.connection import Connection
 from .adb.sync import Sync
 from .adb.parser import Parser

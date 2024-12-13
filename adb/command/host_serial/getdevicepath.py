@@ -1,19 +1,14 @@
 from adb.command import Command
 from adb.protocol import Protocol
-import re
 
-class DisconnectCommand(Command):
-    RE_OK = re.compile(r'^$')
+class GetDevicePathCommand(Command):
 
-    def execute(self, host, port):
-        self._send(f"host:disconnect:{host}:{port}")
+    def execute(self, serial):
+        self._send(f"host-serial:{serial}:get-devpath")
         reply = self.parser.readAscii(4)
         if reply == Protocol.OKAY:
             value = self.parser.readValue()
-            if self.RE_OK.match(value):
-                return f"{host}:{port}"
-            else:
-                raise Exception(value)
+            return value.decode()
         elif reply == Protocol.FAIL:
             return self.parser.readError()
         else:

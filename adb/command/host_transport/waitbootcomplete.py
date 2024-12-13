@@ -1,14 +1,16 @@
 from adb.command import Command
 from adb.protocol import Protocol
 
-class ShellCommand(Command):
-    def execute(self, command):
-        if isinstance(command, list):
-            command = ' '.join(map(self._escape, command))
-        self._send(f"shell:{command}")
+class WaitBootCompleteCommand(Command):
+    def execute(self):
+        self._send('shell:while getprop sys.boot_completed 2>/dev/null; do sleep 1; done')
         reply = self.parser.readAscii(4)
         if reply == Protocol.OKAY:
-            return self.parser.raw()
+            try:
+                self.parser.searchLine(r'^1$')
+                return True
+            finally:
+                self.parser.end()
         elif reply == Protocol.FAIL:
             return self.parser.readError()
         else:

@@ -1,14 +1,13 @@
 from adb.command import Command
 from adb.protocol import Protocol
 
-class ShellCommand(Command):
-    def execute(self, command):
-        if isinstance(command, list):
-            command = ' '.join(map(self._escape, command))
-        self._send(f"shell:{command}")
+class HostTransportCommand(Command):
+
+    def execute(self, serial):
+        self._send(f"host:transport:{serial}")
         reply = self.parser.readAscii(4)
         if reply == Protocol.OKAY:
-            return self.parser.raw()
+            return True
         elif reply == Protocol.FAIL:
             return self.parser.readError()
         else:

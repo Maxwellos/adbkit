@@ -2,7 +2,7 @@ import asyncio
 from typing import List, Any
 from .socket import Socket
 
-class Server:
+class TcpUsbServer:
     """
     Server 类实现了一个异步网络服务器，用于管理 ADB 连接。
 
@@ -85,7 +85,7 @@ class Server:
 
 # 示例用法
 async def main():
-    server = Server(None, "device_serial", {})
+    server = TcpUsbServer(None, "device_serial", {})
     await server.start_server('127.0.0.1', 8888)
     try:
         await asyncio.Future()  # 运行直到被取消

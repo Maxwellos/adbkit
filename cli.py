@@ -1,6 +1,6 @@
 import argparse
 import asyncio
-from .client import Client
+from .adb.client import Client
 
 async def list_devices(client):
     devices = await client.devices()

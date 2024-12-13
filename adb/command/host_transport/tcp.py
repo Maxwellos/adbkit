@@ -1,11 +1,9 @@
 from adb.command import Command
 from adb.protocol import Protocol
 
-class ShellCommand(Command):
-    def execute(self, command):
-        if isinstance(command, list):
-            command = ' '.join(map(self._escape, command))
-        self._send(f"shell:{command}")
+class TcpCommand(Command):
+    def execute(self, port, host=None):
+        self._send(f"tcp:{port}" + (f":{host}" if host else ''))
         reply = self.parser.readAscii(4)
         if reply == Protocol.OKAY:
             return self.parser.raw()

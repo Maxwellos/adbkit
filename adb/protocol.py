@@ -52,3 +52,5 @@ class Protocol:
             bytes: Encoded data with length prefix.
         """
         return cls.encode_length(len(data)).encode() + data
+
+

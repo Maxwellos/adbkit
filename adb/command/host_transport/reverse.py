@@ -1,10 +1,9 @@
 from adb.command import Command
 from adb.protocol import Protocol
 
-class ForwardCommand(Command):
-
-    def execute(self, serial, local, remote):
-        self._send(f"host-serial:{serial}:forward:{local};{remote}")
+class ReverseCommand(Command):
+    def execute(self, remote, local):
+        self._send(f"reverse:forward:{remote};{local}")
         reply = self.parser.readAscii(4)
         if reply == Protocol.OKAY:
             reply = self.parser.readAscii(4)

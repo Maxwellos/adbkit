@@ -1,8 +1,10 @@
 import asyncio
-from pyadbkit import Client
+
+import adb
+
 
 async def main():
-    client = Client()
+    client = adb.Client()
 
     # List connected devices
     devices = await client.devices()

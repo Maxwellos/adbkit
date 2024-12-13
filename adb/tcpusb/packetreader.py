@@ -6,7 +6,7 @@ from .packet import Packet
 class PacketReader:
     """
     PacketReader 类用于从流中读取和解析 ADB 协议数据包。
-    
+
     它实现了以下功能：
     1. 从输入流中读取数据。
     2. 解析数据包头部和主体。
@@ -82,6 +82,15 @@ class PacketReader:
         chunk = self.buffer[:length]
         del self.buffer[:length]
         return chunk
+
+    def on_packet(self, _handle):
+        pass
+
+    def on_error(self, _on_reader_error):
+        pass
+
+    def on_end(self, end):
+        pass
 
 
 class PacketReaderError(Exception):

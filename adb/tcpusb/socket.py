@@ -178,6 +178,13 @@ class Socket:
         logger.debug(f"PacketReader error: {err}")
         await self.end()
 
+    async def handle(self):
+        pass
+
+    async def close(self):
+        pass
+
+
 class AuthError(Exception):
     pass
 
