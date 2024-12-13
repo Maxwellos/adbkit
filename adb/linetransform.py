@@ -1,12 +1,12 @@
 import io
 
 class LineTransform(io.BufferedIOBase):
-    def __init__(self, options=None):
+    def __init__(self, **kwargs):
         super().__init__()
-        if options is None:
-            options = {}
+        if kwargs is None:
+            kwargs = {}
         self.savedR = None
-        self.autoDetect = options.get('autoDetect', False)
+        self.autoDetect = kwargs.get('autoDetect', False)
         self.transformNeeded = True
         self.skipBytes = 0
 

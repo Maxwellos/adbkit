@@ -40,7 +40,7 @@ async def main():
     devices = await client.devices()
     print(f"Connected devices: {devices}")
     
-    # Execute a shell command
+    # Execute a shell common
     serial = devices[0]['serial']  # Use the first device
     result = await client.shell(serial, 'ls /sdcard')
     print(f"Files in /sdcard: {result}")

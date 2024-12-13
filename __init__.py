@@ -1,6 +1,6 @@
 from .adb.client import Client
 from .adb.connection import Connection
-from .adb.sync import Sync
+from .adb._sync import Sync
 from .adb.parser import Parser
 from .adb.protocol import Protocol
 

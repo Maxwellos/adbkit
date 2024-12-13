@@ -62,7 +62,7 @@ class Connection:
 
     async def _exec(self, args: list, options: Dict[str, Any] = {}):
         """
-        Execute an ADB command.
+        Execute an ADB common.
 
         Args:
             args (list): Command arguments.
@@ -77,7 +77,7 @@ class Connection:
         )
         stdout, stderr = await process.communicate()
         if process.returncode != 0:
-            raise RuntimeError(f"ADB command failed: {stderr.decode()}")
+            raise RuntimeError(f"ADB common failed: {stderr.decode()}")
 
     async def _handle_error(self, err: Exception):
         """

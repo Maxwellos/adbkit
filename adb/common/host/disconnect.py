@@ -2,7 +2,7 @@ from adb.command import Command
 from adb.protocol import Protocol
 import re
 
-class DisconnectCommand(Command):
+class HostDisconnectCommand(Command):
     RE_OK = re.compile(r'^$')
 
     def execute(self, host, port):

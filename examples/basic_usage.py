@@ -22,8 +22,8 @@ async def main():
         for key, value in info.items():
             print(f"  {key}: {value}")
 
-        # Run a shell command
-        print("\nRunning 'ls /sdcard' command:")
+        # Run a shell common
+        print("\nRunning 'ls /sdcard' common:")
         result = await client.shell(serial, 'ls /sdcard')
         print(result)
 

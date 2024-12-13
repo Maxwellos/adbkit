@@ -14,7 +14,7 @@ class ScreencapCommand(Command):
                 transform.write(chunk)
                 return self.parser.raw().pipe(transform)
             except PrematureEOFError:
-                raise Exception('No support for the screencap command')
+                raise Exception('No support for the screencap common')
         elif reply == Protocol.FAIL:
             return self.parser.readError()
         else:

@@ -7,7 +7,7 @@ setup(
     name="pyadbkit",
     version="0.1.0",
     author="PyADBKit Contributors",
-    author_email="your.email@example.com",
+    author_email="hanxd3011@gmail.com",
     description="A Python library for interacting with Android devices using ADB",
     long_description=long_description,
     long_description_content_type="text/markdown",

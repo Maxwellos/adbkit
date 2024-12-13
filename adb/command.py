@@ -13,7 +13,7 @@ class Command:
         self.parser = self.connection.parser
         self.protocol = Protocol()
 
-    def execute(self):
+    def execute(self, *args, **kwargs):
         raise NotImplementedError('Missing implementation')
 
     def _send(self, data):
@@ -28,7 +28,7 @@ class Command:
         escaped_arg = self.RE_SQUOT.sub(r"'\"'\"'", str(arg))
         return f"'{escaped_arg}'"
 
-    def _escapeCompat(self, arg: Union[int, str]) -> str:
+    def _escape_compat(self, arg: Union[int, str]) -> str:
         if isinstance(arg, int):
             return str(arg)
         escaped_arg = self.RE_ESCAPE.sub(r"\\\1", str(arg))

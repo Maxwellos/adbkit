@@ -7,7 +7,7 @@ class RootCommand(Command):
 
     def execute(self):
         self._send('root:')
-        reply = self.parser.readAscii(4)
+        reply = self.parser.read_ascii(4)
         if reply == Protocol.OKAY:
             value = self.parser.readAll()
             if self.RE_OK.search(value):

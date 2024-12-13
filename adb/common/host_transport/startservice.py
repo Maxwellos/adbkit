@@ -1,4 +1,4 @@
-from adb.command.host_transport.startactivity import StartActivityCommand
+from adb.common.host_transport.startactivity import StartActivityCommand
 
 class StartServiceCommand(StartActivityCommand):
     def execute(self, options):

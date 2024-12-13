@@ -6,10 +6,10 @@ from typing import List, Union, BinaryIO
 
 from .parser import Parser
 from .protocol import Protocol
-from .sync.stats import Stats
-from .sync.entry import Entry
-from .sync.pushtransfer import PushTransfer
-from .sync.pulltransfer import PullTransfer
+from ._sync.stats import Stats
+from ._sync.entry import Entry
+from ._sync.pushtransfer import PushTransfer
+from ._sync.pulltransfer import PullTransfer
 
 logger = logging.getLogger(__name__)
 

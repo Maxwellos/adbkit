@@ -1,7 +1,7 @@
 import unittest
 import asyncio
 from unittest.mock import Mock, patch
-from pyadbkit.client import Client, AdbError, DeviceNotFoundError, CommandExecutionError
+from adb.client import Client
 
 class TestClient(unittest.TestCase):
     def setUp(self):
@@ -14,7 +14,7 @@ class TestClient(unittest.TestCase):
         mock_conn.connect = asyncio.coroutine(lambda: None)
 
         conn = await self.client.connection()
-        
+
         self.assertEqual(conn, mock_conn)
         mock_conn.connect.assert_called_once()
 
@@ -31,7 +31,7 @@ class TestClient(unittest.TestCase):
         mock_command.execute = asyncio.coroutine(lambda: "1.0.41")
 
         version = await self.client.version()
-        
+
         self.assertEqual(version, "1.0.41")
         mock_version_command.assert_called_once_with(mock_conn)
         mock_command.execute.assert_called_once()

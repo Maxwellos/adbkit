@@ -1,6 +1,5 @@
 from adb.command import Command
 from adb.protocol import Protocol
-from adb.parser import Promise, TimeoutError
 
 class MonkeyCommand(Command):
     def __init__(self, *args, **kwargs):

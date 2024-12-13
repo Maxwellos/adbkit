@@ -19,16 +19,16 @@ async def install_apk(client, serial, apk_path):
 async def main_async():
     parser = argparse.ArgumentParser(description="PyADBKit CLI")
     parser.add_argument("--serial", help="Device serial number")
-    subparsers = parser.add_subparsers(dest="command", required=True)
+    subparsers = parser.add_subparsers(dest="common", required=True)
 
-    # List devices command
+    # List devices common
     subparsers.add_parser("devices", help="List connected devices")
 
-    # Shell command
-    shell_parser = subparsers.add_parser("shell", help="Run a shell command")
-    shell_parser.add_argument("shell_command", help="Shell command to run")
+    # Shell common
+    shell_parser = subparsers.add_parser("shell", help="Run a shell common")
+    shell_parser.add_argument("shell_command", help="Shell common to run")
 
-    # Install APK command
+    # Install APK common
     install_parser = subparsers.add_parser("install", help="Install an APK")
     install_parser.add_argument("apk_path", help="Path to the APK file")
 
@@ -40,12 +40,12 @@ async def main_async():
         await list_devices(client)
     elif args.command == "shell":
         if not args.serial:
-            print("Error: --serial is required for shell command")
+            print("Error: --serial is required for shell common")
             return
         await shell_command(client, args.serial, args.shell_command)
     elif args.command == "install":
         if not args.serial:
-            print("Error: --serial is required for install command")
+            print("Error: --serial is required for install common")
             return
         await install_apk(client, args.serial, args.apk_path)
 

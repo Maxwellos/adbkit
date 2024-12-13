@@ -1,48 +1,51 @@
 import asyncio
-import logging
-from typing import Any, Optional
-from ..parser import Parser
-from ..protocol import Protocol
+from asyncio import StreamReader, StreamWriter
+from typing import Optional
 from .packet import Packet
+from .protocol import Protocol
+from .parser import Parser
+import logging
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger('adb.tcpusb.service')
 
 class Service:
-    """
-    Service 类实现了 ADB 服务的核心功能，包括处理各种类型的数据包和管理与设备的通信。
-    """
+    class PrematurePacketError(Exception):
+        def __init__(self, packet):
+            self.packet = packet
+            super().__init__("Premature packet")
 
-    def __init__(self, client: Any, serial: str, local_id: int, remote_id: int, socket: Any):
+    class LateTransportError(Exception):
+        def __init__(self):
+            super().__init__("Late transport")
+
+    def __init__(self, client, serial, local_id, remote_id, reader: StreamReader, writer: StreamWriter):
         self.client = client
         self.serial = serial
         self.local_id = local_id
         self.remote_id = remote_id
-        self.socket = socket
+        self.reader = reader
+        self.writer = writer
         self.opened = False
         self.ended = False
         self.transport = None
         self.need_ack = False
 
     async def end(self):
-        """结束服务并关闭连接。"""
         if self.transport:
             self.transport.close()
         if self.ended:
-            return self
-
+            return
         logger.debug('O:A_CLSE')
         local_id = self.local_id if self.opened else 0
         try:
-            await self.socket.write(Packet.assemble(Packet.A_CLSE, local_id, self.remote_id, None))
+            self.writer.write(Packet.assemble(Packet.A_CLSE, local_id, self.remote_id, None))
+            await self.writer.drain()
         except Exception as err:
-            logger.error(f"Error while ending service: {err}")
-
+            logger.error(f"Error sending A_CLSE packet: {err}")
         self.transport = None
         self.ended = True
-        return self
 
-    async def handle(self, packet: Packet):
-        """处理接收到的数据包。"""
+    async def handle(self, packet):
         try:
             if packet.command == Packet.A_OPEN:
                 await self._handle_open_packet(packet)
@@ -58,82 +61,70 @@ class Service:
             logger.error(f"Error handling packet: {err}")
             await self.end()
 
-    async def _handle_open_packet(self, packet: Packet):
-        logger.debug(f'I:A_OPEN {packet}')
+    async def _handle_open_packet(self, packet):
+        logger.debug('I:A_OPEN', packet)
+        self.transport = await self.client.transport(self.serial)
+        if self.ended:
+            raise self.LateTransportError()
+        self.transport.write(Protocol.encode_data(packet.data[:-1]))
+        reply = await self.transport.parser.read_ascii(4)
+        if reply == Protocol.OKAY:
+            logger.debug('O:A_OKAY')
+            self.writer.write(Packet.assemble(Packet.A_OKAY, self.local_id, self.remote_id, None))
+            await self.writer.drain()
+            self.opened = True
+        elif reply == Protocol.FAIL:
+            await self.transport.parser.read_error()
+        else:
+            await self.transport.parser.unexpected(reply, 'OKAY or FAIL')
+        await self._start_transport()
+
+    async def _start_transport(self):
         try:
-            self.transport = await self.client.transport(self.serial)
-            if self.ended:
-                raise LateTransportError()
-
-            await self.transport.write(Protocol.encode_data(packet.data[:-1]))
-            reply = await self.transport.parser.read_ascii(4)
-
-            if reply == Protocol.OKAY:
-                logger.debug('O:A_OKAY')
-                await self.socket.write(Packet.assemble(Packet.A_OKAY, self.local_id, self.remote_id, None))
-                self.opened = True
-            elif reply == Protocol.FAIL:
-                error = await self.transport.parser.read_error()
-                raise Exception(f"Failed to open transport: {error}")
-            else:
-                raise ValueError(f"Unexpected reply: {reply}")
-
             while not self.ended:
                 await self._try_push()
-                await asyncio.sleep(0)  # Allow other tasks to run
-
-        except Exception as err:
-            logger.error(f"Error in _handle_open_packet: {err}")
+                await asyncio.sleep(0.1)
         finally:
             await self.end()
 
-    async def _handle_okay_packet(self, packet: Packet):
-        logger.debug(f'I:A_OKAY {packet}')
+    async def _handle_okay_packet(self, packet):
+        logger.debug('I:A_OKAY', packet)
         if self.ended:
             return
         if not self.transport:
-            raise PrematurePacketError(packet)
+            raise self.PrematurePacketError(packet)
         self.need_ack = False
         await self._try_push()
 
-    async def _handle_write_packet(self, packet: Packet):
-        logger.debug(f'I:A_WRTE {packet}')
+    async def _handle_write_packet(self, packet):
+        logger.debug('I:A_WRTE', packet)
         if self.ended:
             return
         if not self.transport:
-            raise PrematurePacketError(packet)
+            raise self.PrematurePacketError(packet)
         if packet.data:
-            await self.transport.write(packet.data)
+            self.transport.write(packet.data)
         logger.debug('O:A_OKAY')
-        await self.socket.write(Packet.assemble(Packet.A_OKAY, self.local_id, self.remote_id, None))
+        self.writer.write(Packet.assemble(Packet.A_OKAY, self.local_id, self.remote_id, None))
+        await self.writer.drain()
 
-    async def _handle_close_packet(self, packet: Packet):
-        logger.debug(f'I:A_CLSE {packet}')
+    async def _handle_close_packet(self, packet):
+        logger.debug('I:A_CLSE', packet)
         if self.ended:
             return
         if not self.transport:
-            raise PrematurePacketError(packet)
+            raise self.PrematurePacketError(packet)
         await self.end()
 
     async def _try_push(self):
         if self.need_ack or self.ended:
             return
-        chunk = self._read_chunk(self.transport.socket)
+        chunk = await self._read_chunk(self.transport)
         if chunk:
             logger.debug('O:A_WRTE')
-            await self.socket.write(Packet.assemble(Packet.A_WRTE, self.local_id, self.remote_id, chunk))
+            self.writer.write(Packet.assemble(Packet.A_WRTE, self.local_id, self.remote_id, chunk))
+            await self.writer.drain()
             self.need_ack = True
 
-    def _read_chunk(self, stream: Any) -> Optional[bytes]:
-        return stream.read(self.socket.max_payload) or stream.read()
-
-class PrematurePacketError(Exception):
-    """当收到预期之外的数据包时抛出的异常。"""
-    def __init__(self, packet: Packet):
-        self.packet = packet
-        super().__init__("Premature packet")
-
-class LateTransportError(Exception):
-    """当传输已经结束但仍尝试使用时抛出的异常。"""
-    def __init__(self):
-        super().__init__("Late transport")
+    async def _read_chunk(self, stream):
+        return await stream.read(self.writer.get_extra_info('max_payload')) or await stream.read()

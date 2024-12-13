@@ -1,54 +1,55 @@
 import asyncio
+import logging
 from typing import Optional, Callable, Any, List, Dict
-import adbkit_monkey
-import adbkit_logcat
-import debug
+# import monkey
+# import logcat
+# debug = logging.debug
 
 from .connection import Connection
 
 from .parser import Parser
 from .proc.stat import ProcStat
-from .command.host.version import HostVersionCommand
-from .command.host.connect import HostConnectCommand
-from .command.host.devices import HostDevicesCommand
-from .command.host.deviceswithpaths import HostDevicesWithPathsCommand
-from .command.host.disconnect import HostDisconnectCommand
-from .command.host.trackdevices import HostTrackDevicesCommand
-from .command.host.kill import HostKillCommand
-from .command.host.transport import HostTransportCommand
-from .command.host_transport.clear import ClearCommand
-from .command.host_transport.framebuffer import FrameBufferCommand
-from .command.host_transport.getfeatures import GetFeaturesCommand
-from .command.host_transport.getpackages import GetPackagesCommand
-from .command.host_transport.getproperties import GetPropertiesCommand
-from .command.host_transport.install import InstallCommand
-from .command.host_transport.isinstalled import IsInstalledCommand
-from .command.host_transport.listreverses import ListReversesCommand
-from .command.host_transport.local import LocalCommand
-from .command.host_transport.logcat import LogcatCommand
-from .command.host_transport.log import LogCommand
-from .command.host_transport.monkey import MonkeyCommand
-from .command.host_transport.reboot import RebootCommand
-from .command.host_transport.remount import RemountCommand
-from .command.host_transport.root import RootCommand
-from .command.host_transport.reverse import ReverseCommand
-from .command.host_transport.screencap import ScreencapCommand
-from .command.host_transport.shell import ShellCommand
-from .command.host_transport.startactivity import StartActivityCommand
-from .command.host_transport.startservice import StartServiceCommand
-from .command.host_transport.sync import SyncCommand
-from .command.host_transport.tcp import TcpCommand
-from .command.host_transport.tcpip import TcpIpCommand
-from .command.host_transport.trackjdwp import TrackJdwpCommand
-from .command.host_transport.uninstall import UninstallCommand
-from .command.host_transport.usb import UsbCommand
-from .command.host_transport.waitbootcomplete import WaitBootCompleteCommand
-from .command.host_serial.forward import ForwardCommand
-from .command.host_serial.getdevicepath import GetDevicePathCommand
-from .command.host_serial.getserialno import GetSerialNoCommand
-from .command.host_serial.getstate import GetStateCommand
-from .command.host_serial.listforwards import ListForwardsCommand
-from .command.host_serial.waitfordevice import WaitForDeviceCommand
+from .common.host.version import HostVersionCommand
+from .common.host.connect import HostConnectCommand
+from .common.host.devices import HostDevicesCommand
+from .common.host.deviceswithpaths import HostDevicesWithPathsCommand
+from .common.host.disconnect import HostDisconnectCommand
+from .common.host.trackdevices import HostTrackDevicesCommand
+from .common.host.kill import HostKillCommand
+from .common.host.transport import HostTransportCommand
+from .common.host_transport.clear import ClearCommand
+from .common.host_transport.framebuffer import FrameBufferCommand
+from .common.host_transport.getfeatures import GetFeaturesCommand
+from .common.host_transport.getpackages import GetPackagesCommand
+from .common.host_transport.getproperties import GetPropertiesCommand
+from .common.host_transport.install import InstallCommand
+from .common.host_transport.isinstalled import IsInstalledCommand
+from .common.host_transport.listreverses import ListReversesCommand
+from .common.host_transport.local import LocalCommand
+from .common.host_transport.logcat import LogcatCommand
+from .common.host_transport.log import LogCommand
+from .common.host_transport.monkey import MonkeyCommand
+from .common.host_transport.reboot import RebootCommand
+from .common.host_transport.remount import RemountCommand
+from .common.host_transport.root import RootCommand
+from .common.host_transport.reverse import ReverseCommand
+from .common.host_transport.screencap import ScreencapCommand
+from .common.host_transport.shell import ShellCommand
+from .common.host_transport.startactivity import StartActivityCommand
+from .common.host_transport.startservice import StartServiceCommand
+from .common.host_transport.sync import SyncCommand
+from .common.host_transport.tcp import TcpCommand
+from .common.host_transport.tcpip import TcpIpCommand
+from .common.host_transport.trackjdwp import TrackJdwpCommand
+from .common.host_transport.uninstall import UninstallCommand
+from .common.host_transport.usb import UsbCommand
+from .common.host_transport.waitbootcomplete import WaitBootCompleteCommand
+from .common.host_serial.forward import ForwardCommand
+from .common.host_serial.getdevicepath import GetDevicePathCommand
+from .common.host_serial.getserialno import GetSerialNoCommand
+from .common.host_serial.getstate import GetStateCommand
+from .common.host_serial.listforwards import ListForwardsCommand
+from .common.host_serial.waitfordevice import WaitForDeviceCommand
 from .tcpusb.server import TcpUsbServer
 
 class NoUserOptionError(Exception):
